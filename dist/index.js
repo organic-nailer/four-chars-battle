@@ -175,7 +175,7 @@ const textEventHandler = async (event) => {
     if (data.idioms.some(i => i.idiom === text)) {
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: `${text}はもう出たもん！`,
+            text: `${text}はもう出たもん！やり直し！`,
         });
         return;
     }
@@ -190,15 +190,15 @@ const textEventHandler = async (event) => {
         return;
     }
     else {
+        lineGameMap.delete(userId);
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: gameManager.idiom2String(data.idioms, null, "\n"),
+            text: gameManager.idiom2String(data.idioms, stability, "\n"),
         });
         await client.replyMessage(replyToken, {
             type: 'text',
             text: '崩れました...',
         });
-        lineGameMap.delete(userId);
         return;
     }
 };

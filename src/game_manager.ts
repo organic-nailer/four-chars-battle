@@ -52,13 +52,14 @@ export class GameManager {
 	    const offsetMax = idioms.reduce((acc, cur) => Math.max(acc, cur.offset), 0);
 	    const offsetMin = idioms.reduce((acc, cur) => Math.min(acc, cur.offset), 0);
 	    const strList = idioms.map((idiom) => {
-			const detail = this.getDetail(idiom.idiom);
-		    return `${this.spaces(idiom.offset - offsetMin)}${idiom.idiom}(${detail.centerOfGravity},${detail.weight})${this.spaces(offsetMax - idiom.offset)}`;
+			// const detail = this.getDetail(idiom.idiom);
+		    // return `${this.spaces(idiom.offset - offsetMin)}${idiom.idiom}(${detail.centerOfGravity},${detail.weight})${this.spaces(offsetMax - idiom.offset)}`;
+			return `${this.spaces(idiom.offset - offsetMin)}${idiom.idiom}${this.spaces(offsetMax - idiom.offset)}`;
  	    });
 		 if(collapsedHeight !== null) {
 			 strList.splice(collapsedHeight+1, 0, Array(-offsetMin+offsetMax+4).fill("ー").join(""));
 		 }
-		 return `${Array(offsetMin+1).fill("＿").join("")}${idioms.length}m${Array(offsetMax+1).fill("＿").join("")}` + divider + strList.join(divider);
+		 return `${Array(-offsetMin).fill("＿").join("")}${idioms.length}m${Array(offsetMax).fill("＿").join("")}` + divider + strList.join(divider);
     }
 
     private spaces(n: number): String {
