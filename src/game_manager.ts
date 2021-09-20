@@ -58,7 +58,7 @@ export class GameManager {
 		 if(collapsedHeight !== null) {
 			 strList.splice(collapsedHeight+1, 0, Array(-offsetMin+offsetMax+4).fill("ー").join(""));
 		 }
-		 return strList.join(divider);
+		 return `${Array(offsetMin+1).fill("＿").join("")}${idioms.length}m${Array(offsetMax+1).fill("＿").join("")}` + divider + strList.join(divider);
     }
 
     private spaces(n: number): String {
