@@ -88,6 +88,15 @@ export class GameManager {
 		if(diffAbs <= 20) return diffIsPositive ? 2 : -2;
 		return diffIsPositive ? 3 : -3;
 	}
+
+	getRandomIdioms(num: number): string[] {
+		const idiomList = Array.from(this.idiomMap.keys());
+		const result = new Array(num);
+		for(let i = 0; i < num; i++) {
+			result[i] = idiomList[Math.floor(Math.random() * idiomList.length)];
+		}
+		return result;
+	}
 }
 
 interface IdiomDetail {

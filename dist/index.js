@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bot_sdk_1 = require("@line/bot-sdk");
 const game_manager_1 = require("./game_manager");
+const reply_manager_1 = require("./reply_manager");
 const clientConfig = {
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
     channelSecret: process.env.CHANNEL_SECRET,
@@ -136,12 +137,14 @@ const textEventHandler = async (event) => {
             await client.replyMessage(replyToken, {
                 type: 'text',
                 text: 'ゲームをはじめます',
+                quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
             });
         }
         else {
             await client.replyMessage(replyToken, {
                 type: 'text',
                 text: '「はじめる」と言ってね',
+                quickReply: reply_manager_1.ReplyManager.getRepliesNotInGame()
             });
         }
         return;
@@ -151,6 +154,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: 'ゲームをやめます',
+            quickReply: reply_manager_1.ReplyManager.getRepliesNotInGame()
         });
         return;
     }
@@ -159,6 +163,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: 'やりなおします',
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
         });
         return;
     }
@@ -167,6 +172,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: 'ちょっとそれわかんない！ごめんね青春！',
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
         });
         return;
     }
@@ -176,6 +182,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: `${text}はもう出たもん！やり直し！`,
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
         });
         return;
     }
@@ -186,6 +193,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: gameManager.idiom2String(data.idioms, null, "\n"),
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
         });
         return;
     }
@@ -194,6 +202,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, [{
                 type: 'text',
                 text: gameManager.idiom2String(data.idioms, stability, "\n"),
+                quickReply: reply_manager_1.ReplyManager.getRepliesNotInGame()
             },
             {
                 type: 'text',

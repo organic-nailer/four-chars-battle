@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import { ClientConfig, Client, middleware, MiddlewareConfig, WebhookEvent, TextMessage, MessageAPIResponseBase } from '@line/bot-sdk';
 import { GameManager, DisplayIdiomData } from "./game_manager";
+import { ReplyManager } from "./reply_manager";
 
 const clientConfig: ClientConfig = {
 	channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
@@ -162,12 +163,14 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 			await client.replyMessage(replyToken, {
 				type: 'text',
 				text: 'ゲームをはじめます',
+				quickReply: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
 			});
 		}
 		else {
 			await client.replyMessage(replyToken, {
 				type: 'text',
 				text: '「はじめる」と言ってね',
+				quickReply: ReplyManager.getRepliesNotInGame()
 			});
 		}
 		return;
@@ -178,6 +181,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, {
 			type: 'text',
 			text: 'ゲームをやめます',
+			quickReply: ReplyManager.getRepliesNotInGame()
 		});
 		return;
 	}
@@ -186,6 +190,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, {
 			type: 'text',
 			text: 'やりなおします',
+			quickReply: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
 		});
 		return;
 	}
@@ -195,6 +200,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, {
 			type: 'text',
 			text: 'ちょっとそれわかんない！ごめんね青春！',
+			quickReply: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
 		});
 		return;
 	}
@@ -206,6 +212,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, {
 			type: 'text',
 			text: `${text}はもう出たもん！やり直し！`,
+			quickReply: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
 		});
 		return;
 	}
@@ -218,6 +225,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, {
 			type: 'text',
 			text: gameManager.idiom2String(data.idioms, null, "\n"),
+			quickReply: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
 		});
 		return;
 	}
@@ -226,6 +234,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, [{
 			type: 'text',
 			text: gameManager.idiom2String(data.idioms, stability, "\n"),
+			quickReply: ReplyManager.getRepliesNotInGame()
 		},
 		{
 			type: 'text',
