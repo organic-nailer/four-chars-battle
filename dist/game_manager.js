@@ -22,16 +22,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameManager = void 0;
 const fs = __importStar(require("fs"));
 class GameManager {
-    constructor() {
+    constructor(altIdioms = null) {
         this.idiomMap = new Map();
+        if (altIdioms !== null) {
+            this.setIdioms(altIdioms);
+            return;
+        }
         fs.readFile('./data/processed_idioms.txt', 'utf8', (err, data) => {
             if (err)
                 throw err;
-            data.split("\n").forEach((line) => {
-                const [idiom, weight, center] = line.split(",");
-                this.idiomMap.set(idiom, { centerOfGravity: parseFloat(center), weight: parseInt(weight) });
-            });
+            this.setIdioms(data);
             console.log("finished GameManager init");
+        });
+    }
+    setIdioms(idioms) {
+        idioms.split("\n").forEach((line) => {
+            const [idiom, weight, center] = line.split(",");
+            this.idiomMap.set(idiom, { centerOfGravity: parseFloat(center), weight: parseInt(weight) });
         });
     }
     isIdiom(text) {
@@ -43,8 +50,8 @@ class GameManager {
         let index = 0;
         let currentInfo = { centerOfGravity: 0, weight: 0 };
         while (index < idioms.length) {
-            currentInfo = this.mergeDetail(currentInfo, this.getDetail(idioms[index].idiom));
             const offset = index + 1 < idioms.length ? idioms[index].offset - idioms[index + 1].offset : idioms[index].offset;
+            currentInfo = this.mergeDetail(currentInfo, this.getDetail(idioms[index].idiom), offset);
             console.log(`0-${index} center is ${currentInfo.centerOfGravity}, ${currentInfo.weight} : offset is ${offset}`);
             if (!this.checkStableOffsetting(currentInfo.centerOfGravity, offset))
                 return index;
@@ -59,9 +66,12 @@ class GameManager {
             return center >= -offset - 2;
         return center <= -offset + 2;
     }
-    mergeDetail(a, b) {
-        const weight = a.weight + b.weight;
-        return { centerOfGravity: (a.centerOfGravity * a.weight + b.centerOfGravity * b.weight) / weight, weight: weight };
+    mergeDetail(base, above, offset) {
+        const weight = base.weight + above.weight;
+        return {
+            centerOfGravity: (base.centerOfGravity * base.weight + (above.centerOfGravity + offset) * above.weight) / weight,
+            weight: weight
+        };
     }
     getDetail(idiom) {
         return this.idiomMap.get(idiom) ?? { centerOfGravity: 0, weight: 0 };

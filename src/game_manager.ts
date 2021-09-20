@@ -4,14 +4,22 @@ export class GameManager {
 
 	private idiomMap: Map<String, IdiomDetail> = new Map();
 
-	constructor() {
+	constructor(altIdioms: String | null = null) {
+		if(altIdioms !== null) {
+			this.setIdioms(altIdioms);
+			return;
+		}
 		fs.readFile('./data/processed_idioms.txt', 'utf8', (err, data) => {
 			if (err) throw err;
-			data.split("\n").forEach((line) => {
-				const [idiom, weight, center] = line.split(",");
-				this.idiomMap.set(idiom, {centerOfGravity: parseFloat(center), weight: parseInt(weight)});
-			});
+			this.setIdioms(data);
 			console.log("finished GameManager init");
+		});
+	}
+
+	private setIdioms(idioms: String): void {
+		idioms.split("\n").forEach((line) => {
+			const [idiom, weight, center] = line.split(",");
+			this.idiomMap.set(idiom, {centerOfGravity: parseFloat(center), weight: parseInt(weight)});
 		});
 	}
 
@@ -24,8 +32,8 @@ export class GameManager {
 		let index = 0;
 		let currentInfo: IdiomDetail = {centerOfGravity: 0, weight: 0};
 		while(index < idioms.length) {
-			currentInfo = this.mergeDetail(currentInfo, this.getDetail(idioms[index].idiom));
 			const offset = index + 1 < idioms.length ? idioms[index].offset - idioms[index + 1].offset : idioms[index].offset;
+			currentInfo = this.mergeDetail(currentInfo, this.getDetail(idioms[index].idiom), offset);
 			console.log(`0-${index} center is ${currentInfo.centerOfGravity}, ${currentInfo.weight} : offset is ${offset}`);
 			if(!this.checkStableOffsetting(currentInfo.centerOfGravity, offset)) return index;
 			index++;
@@ -39,9 +47,12 @@ export class GameManager {
 		return center <= -offset + 2;
 	}
 
-	private mergeDetail(a: IdiomDetail, b: IdiomDetail): IdiomDetail {
-		const weight = a.weight + b.weight;
-		return { centerOfGravity: (a.centerOfGravity * a.weight + b.centerOfGravity * b.weight) / weight, weight: weight };
+	private mergeDetail(base: IdiomDetail, above: IdiomDetail, offset: number): IdiomDetail {
+		const weight = base.weight + above.weight;
+		return { 
+			centerOfGravity: (base.centerOfGravity * base.weight + (above.centerOfGravity + offset) * above.weight) / weight, 
+			weight: weight 
+		};
 	}
 
 	private getDetail(idiom: String): IdiomDetail {
