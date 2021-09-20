@@ -223,14 +223,14 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 	}
 	else {
 		lineGameMap.delete(userId);
-		await client.replyMessage(replyToken, {
+		await client.replyMessage(replyToken, [{
 			type: 'text',
 			text: gameManager.idiom2String(data.idioms, stability, "\n"),
-		});
-		await client.replyMessage(replyToken, {
+		},
+		{
 			type: 'text',
 			text: '崩れました...',
-		});
+		}]);
 		return;
 	}
 };

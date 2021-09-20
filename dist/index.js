@@ -191,14 +191,14 @@ const textEventHandler = async (event) => {
     }
     else {
         lineGameMap.delete(userId);
-        await client.replyMessage(replyToken, {
-            type: 'text',
-            text: gameManager.idiom2String(data.idioms, stability, "\n"),
-        });
-        await client.replyMessage(replyToken, {
-            type: 'text',
-            text: '崩れました...',
-        });
+        await client.replyMessage(replyToken, [{
+                type: 'text',
+                text: gameManager.idiom2String(data.idioms, stability, "\n"),
+            },
+            {
+                type: 'text',
+                text: '崩れました...',
+            }]);
         return;
     }
 };
