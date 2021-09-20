@@ -134,24 +134,38 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		return;
 	}
 
+	const reply = getGameState(userId) == GameState.NotInGame 
+		? ReplyManager.getRepliesNotInGame() 
+		: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5));
 	if(text === "成績を見る") {
 		await client.replyMessage(replyToken, {
 			type: 'text',
 			text: '成績をいい感じに返す',
+			quickReply: reply
 		});
 		return;
 	}
 	if(text === "説明を見る") {
 		await client.replyMessage(replyToken, {
 			type: 'text',
-			text: '説明をいい感じに返す',
+			text: '四字熟語をなるべく高く積み上げよう！\n'
+				+ '前後の画数の差によって積み上がる位置が変わります\n'
+				+ 'バランスがとれなくなったら終了！',
+			quickReply: reply
 		});
 		return;
 	}
 	if(text === "アルゴリズム") {
 		await client.replyMessage(replyToken, {
 			type: 'text',
-			text: 'アルゴリズムをいい感じに返す',
+			text: '差分=追加する四字熟語-下の四字熟語\n'
+				+ '方向=符号(差分)が+ならば右、-ならば左\n'
+				+ '差分の絶対値=abs(差分)\n'
+				+ '差分の絶対値<=1ならばずらさない\n'
+				+ '差分の絶対値<=5ならば方向に1ずらして積む\n'
+				+ '差分の絶対値<=20ならば方向に2ずらして積む\n'
+				+ '方向に3ずらして積む\n',
+			quickReply: reply
 		});
 		return;
 	}
@@ -234,11 +248,11 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		await client.replyMessage(replyToken, [{
 			type: 'text',
 			text: gameManager.idiom2String(data.idioms, stability, "\n"),
-			quickReply: ReplyManager.getRepliesNotInGame()
 		},
 		{
 			type: 'text',
 			text: '崩れました...',
+			quickReply: ReplyManager.getRepliesNotInGame()
 		}]);
 		return;
 	}
