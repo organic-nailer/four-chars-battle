@@ -177,6 +177,21 @@ const textEventHandler = async (
         });
         return;
     }
+    if (text === '遊び方') {
+        await client.replyMessage(replyToken, {
+            type: 'text',
+            text:
+                '四字熟語をなるべく高く積み上げよう！\n' +
+                '前後の画数の差によって積み上がる位置が変わります\n' +
+                'バランスがとれなくなったら終了！\n\n' +
+                '1.「はじめる」でゲームスタート\n' +
+                '2.四字熟語を打ち込むと積まれるよ\n' +
+                '　なるべく画数の近い四字熟語を選ぼう\n' +
+                '3.積み方に無理がでると崩れて終了',
+            quickReply: reply,
+        });
+        return;
+    }
     if (text === 'アルゴリズム') {
         await client.replyMessage(replyToken, {
             type: 'text',
@@ -184,8 +199,8 @@ const textEventHandler = async (
                 '差分=追加する四字熟語-下の四字熟語\n' +
                 '方向=符号(差分)が+ならば右、-ならば左\n' +
                 '差分の絶対値=abs(差分)\n' +
-                '差分の絶対値<=1ならばずらさない\n' +
-                '差分の絶対値<=5ならば方向に1ずらして積む\n' +
+                '差分の絶対値<=2ならばずらさない\n' +
+                '差分の絶対値<=10ならば方向に1ずらして積む\n' +
                 '差分の絶対値<=20ならば方向に2ずらして積む\n' +
                 '方向に3ずらして積む\n',
             quickReply: reply,
@@ -301,6 +316,13 @@ const textEventHandler = async (
                 type: 'text',
                 text: `崩れました...\n記録: ${data.idioms.length}m`,
                 quickReply: ReplyManager.getRepliesNotInGame(),
+            },
+            {
+                type: 'text',
+                text: `参考:\n${gameManager.createCauseOfDefeat(
+                    data.idioms,
+                    '\n'
+                )}`,
             },
         ]);
         return;

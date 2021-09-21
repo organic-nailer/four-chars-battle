@@ -61,6 +61,14 @@ export class GameManager {
         return center <= -offset + 2;
     }
 
+    createCauseOfDefeat(idioms: DisplayIdiomData[], divider: string): string {
+        const causeOfDefeat = idioms.map((idiom) => {
+            const detail = this.getDetail(idiom.idiom);
+            return `${idiom.idiom} - ${detail.weight}画`;
+        });
+        return causeOfDefeat.join(divider);
+    }
+
     private mergeDetail(
         base: IdiomDetail,
         above: IdiomDetail,
@@ -130,8 +138,8 @@ export class GameManager {
         const diff = aboveDetail.weight - baseDetail.weight;
         const diffAbs = Math.abs(diff);
         const diffIsPositive = diff > 0;
-        if (diffAbs <= 1) return 0;
-        if (diffAbs <= 5) return diffIsPositive ? 1 : -1;
+        if (diffAbs <= 2) return 0;
+        if (diffAbs <= 10) return diffIsPositive ? 1 : -1;
         if (diffAbs <= 20) return diffIsPositive ? 2 : -2;
         return diffIsPositive ? 3 : -3;
     }
