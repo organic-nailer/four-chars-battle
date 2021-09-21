@@ -1,0 +1,6 @@
+CREATE TABLE UserData (
+	user_id TEXT PRIMARY KEY,
+	high_score INT,
+	updated_at DATE,
+	nickname TEXT
+);

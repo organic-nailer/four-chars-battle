@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const bot_sdk_1 = require("@line/bot-sdk");
 const game_manager_1 = require("./game_manager");
 const reply_manager_1 = require("./reply_manager");
+const score_storage_1 = require("score_storage");
 const clientConfig = {
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
     channelSecret: process.env.CHANNEL_SECRET,
@@ -22,6 +23,7 @@ const app = (0, express_1.default)();
 app.set("view engine", "ejs");
 app.use(express_1.default.urlencoded({ extended: true }));
 const gameManager = new game_manager_1.GameManager();
+const scoreStorage = new score_storage_1.ScoreStorage();
 const gameData = {
     idioms: [],
     status: "問題なし",
@@ -113,9 +115,10 @@ const textEventHandler = async (event) => {
         ? reply_manager_1.ReplyManager.getRepliesNotInGame()
         : reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5));
     if (text === "成績を見る") {
+        const score = await scoreStorage.getUserScore(userId);
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: '成績をいい感じに返す',
+            text: score ? `最高高さ:${score}m` : '成績がまだないよ',
             quickReply: reply
         });
         return;
@@ -163,20 +166,23 @@ const textEventHandler = async (event) => {
         }
         return;
     }
+    const data = lineGameMap.get(userId);
     if (text === "やめる") {
+        await scoreStorage.saveScore(userId, data.idioms.length);
         lineGameMap.delete(userId);
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: 'ゲームをやめます',
+            text: 'ゲームをやめます\n記録:${data.idioms.length}',
             quickReply: reply_manager_1.ReplyManager.getRepliesNotInGame()
         });
         return;
     }
     if (text === "やりなおす") {
+        await scoreStorage.saveScore(userId, data.idioms.length);
         lineGameMap.set(userId, { idioms: [], status: "問題なし", collapsedHeight: null });
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: 'やりなおします',
+            text: `やりなおします\n記録:${data.idioms.length}`,
             quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
         });
         return;
@@ -190,7 +196,6 @@ const textEventHandler = async (event) => {
         });
         return;
     }
-    const data = lineGameMap.get(userId);
     // すでに使用した四字熟語の場合
     if (data.idioms.some(i => i.idiom === text)) {
         await client.replyMessage(replyToken, {
@@ -212,6 +217,7 @@ const textEventHandler = async (event) => {
         return;
     }
     else {
+        await scoreStorage.saveScore(userId, data.idioms.length);
         lineGameMap.delete(userId);
         await client.replyMessage(replyToken, [{
                 type: 'text',
@@ -219,7 +225,7 @@ const textEventHandler = async (event) => {
             },
             {
                 type: 'text',
-                text: '崩れました...',
+                text: `崩れました...\n記録: ${data.idioms.length}m`,
                 quickReply: reply_manager_1.ReplyManager.getRepliesNotInGame()
             }]);
         return;

@@ -16,6 +16,7 @@
     "@types/express": "^4.17.13",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.9.2",
+    "@types/pg": "^8.6.1",
     "jest": "^27.2.0",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
@@ -24,6 +25,7 @@
   "dependencies": {
     "@line/bot-sdk": "^7.4.0",
     "ejs": "^3.1.6",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "pg": "^8.7.1"
   }
 }

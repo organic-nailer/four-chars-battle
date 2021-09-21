@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import { ClientConfig, Client, middleware, MiddlewareConfig, WebhookEvent, TextMessage, MessageAPIResponseBase } from '@line/bot-sdk';
 import { GameManager, DisplayIdiomData } from "./game_manager";
 import { ReplyManager } from "./reply_manager";
+import { ScoreStorage } from 'score_storage';
 
 const clientConfig: ClientConfig = {
 	channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
@@ -23,6 +24,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
 const gameManager = new GameManager();
+const scoreStorage = new ScoreStorage();
 
 interface GameData {
 	idioms: DisplayIdiomData[],
@@ -138,9 +140,10 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		? ReplyManager.getRepliesNotInGame() 
 		: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5));
 	if(text === "成績を見る") {
+		const score = await scoreStorage.getUserScore(userId);
 		await client.replyMessage(replyToken, {
 			type: 'text',
-			text: '成績をいい感じに返す',
+			text: score ? `最高高さ:${score}m` : '成績がまだないよ',
 			quickReply: reply
 		});
 		return;
@@ -190,20 +193,24 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		return;
 	}
 
+	const data = lineGameMap.get(userId)!;
+
 	if(text === "やめる") {
+		await scoreStorage.saveScore(userId, data.idioms.length);
 		lineGameMap.delete(userId);
 		await client.replyMessage(replyToken, {
 			type: 'text',
-			text: 'ゲームをやめます',
+			text: 'ゲームをやめます\n記録:${data.idioms.length}',
 			quickReply: ReplyManager.getRepliesNotInGame()
 		});
 		return;
 	}
 	if(text === "やりなおす") {
+		await scoreStorage.saveScore(userId, data.idioms.length);
 		lineGameMap.set(userId, { idioms: [], status: "問題なし", collapsedHeight: null });
 		await client.replyMessage(replyToken, {
 			type: 'text',
-			text: 'やりなおします',
+			text: `やりなおします\n記録:${data.idioms.length}`,
 			quickReply: ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
 		});
 		return;
@@ -218,8 +225,6 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		});
 		return;
 	}
-
-	const data = lineGameMap.get(userId)!;
 
 	// すでに使用した四字熟語の場合
 	if(data.idioms.some(i => i.idiom === text)) {
@@ -244,6 +249,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		return;
 	}
 	else {
+		await scoreStorage.saveScore(userId, data.idioms.length);
 		lineGameMap.delete(userId);
 		await client.replyMessage(replyToken, [{
 			type: 'text',
@@ -251,7 +257,7 @@ const textEventHandler = async (event: WebhookEvent): Promise<MessageAPIResponse
 		},
 		{
 			type: 'text',
-			text: '崩れました...',
+			text: `崩れました...\n記録: ${data.idioms.length}m`,
 			quickReply: ReplyManager.getRepliesNotInGame()
 		}]);
 		return;
