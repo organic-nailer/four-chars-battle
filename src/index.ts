@@ -243,6 +243,10 @@ const textEventHandler = async (
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = lineGameMap.get(userId)!;
+    const topIdiomStrokes =
+        data.idioms.length > 0
+            ? gameManager.getDetail(data.idioms[0].idiom).weight
+            : null;
 
     if (text === 'やめる') {
         await scoreStorage.saveScore(userId, data.idioms.length);
@@ -277,7 +281,7 @@ const textEventHandler = async (
             type: 'text',
             text: 'ちょっとそれわかんない！ごめんね青春！',
             quickReply: ReplyManager.getRepliesInGame(
-                gameManager.getRandomIdioms(5)
+                gameManager.getRandomIdioms(5, topIdiomStrokes)
             ),
         });
         return;
@@ -289,7 +293,7 @@ const textEventHandler = async (
             type: 'text',
             text: `${text}はもう出たもん！やり直し！`,
             quickReply: ReplyManager.getRepliesInGame(
-                gameManager.getRandomIdioms(5)
+                gameManager.getRandomIdioms(5, topIdiomStrokes)
             ),
         });
         return;
@@ -308,7 +312,10 @@ const textEventHandler = async (
             type: 'text',
             text: gameManager.idiom2String(data.idioms, null, '\n'),
             quickReply: ReplyManager.getRepliesInGame(
-                gameManager.getRandomIdioms(5)
+                gameManager.getRandomIdioms(
+                    5,
+                    gameManager.getDetail(text).weight
+                )
             ),
         });
         return;

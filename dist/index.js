@@ -196,6 +196,9 @@ const textEventHandler = async (event) => {
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = lineGameMap.get(userId);
+    const topIdiomStrokes = data.idioms.length > 0
+        ? gameManager.getDetail(data.idioms[0].idiom).weight
+        : null;
     if (text === 'やめる') {
         await scoreStorage.saveScore(userId, data.idioms.length);
         lineGameMap.delete(userId);
@@ -225,7 +228,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: 'ちょっとそれわかんない！ごめんね青春！',
-            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5, topIdiomStrokes)),
         });
         return;
     }
@@ -234,7 +237,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: `${text}はもう出たもん！やり直し！`,
-            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5, topIdiomStrokes)),
         });
         return;
     }
@@ -248,7 +251,7 @@ const textEventHandler = async (event) => {
         await client.replyMessage(replyToken, {
             type: 'text',
             text: gameManager.idiom2String(data.idioms, null, '\n'),
-            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5)),
+            quickReply: reply_manager_1.ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5, gameManager.getDetail(text).weight)),
         });
         return;
     }

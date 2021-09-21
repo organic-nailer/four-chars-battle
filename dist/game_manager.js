@@ -126,8 +126,11 @@ class GameManager {
             return diffIsPositive ? 2 : -2;
         return diffIsPositive ? 3 : -3;
     }
-    getRandomIdioms(num) {
-        const idiomList = Array.from(this.idiomMap.keys());
+    getRandomIdioms(num, weight = null) {
+        let idiomList = Array.from(this.idiomMap.entries());
+        if (weight !== null) {
+            idiomList = idiomList.filter((value) => Math.abs(value[1].weight - weight) <= 15);
+        }
         const result = new Array(num);
         for (let i = 0; i < num; i++) {
             result[i] = idiomList[Math.floor(Math.random() * idiomList.length)];
