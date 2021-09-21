@@ -15,7 +15,8 @@ export class ReplyManager {
         return {
             items: [
                 ReplyManager.createReplyItem('はじめる'),
-                ReplyManager.createReplyItem('説明を見る'),
+                ReplyManager.createReplyItem('遊び方'),
+                ReplyManager.createReplyItem('成績を見る'),
             ],
         };
     }

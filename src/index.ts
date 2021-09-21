@@ -187,7 +187,15 @@ const textEventHandler = async (
                 '1.「はじめる」でゲームスタート\n' +
                 '2.四字熟語を打ち込むと積まれるよ\n' +
                 '　なるべく画数の近い四字熟語を選ぼう\n' +
-                '3.積み方に無理がでると崩れて終了',
+                '3.積み方に無理がでると崩れて終了\n\n' +
+                'アルゴリズム:\n' +
+                '差分=追加する四字熟語-下の四字熟語\n' +
+                '方向=符号(差分)が+ならば右、-ならば左\n' +
+                '差分の絶対値=abs(差分)\n' +
+                '差分の絶対値<=2ならばずらさない\n' +
+                '差分の絶対値<=10ならば方向に1ずらして積む\n' +
+                '差分の絶対値<=20ならば方向に2ずらして積む\n' +
+                '方向に3ずらして積む\n',
             quickReply: reply,
         });
         return;
@@ -315,7 +323,6 @@ const textEventHandler = async (
             {
                 type: 'text',
                 text: `崩れました...\n記録: ${data.idioms.length}m`,
-                quickReply: ReplyManager.getRepliesNotInGame(),
             },
             {
                 type: 'text',
@@ -323,6 +330,7 @@ const textEventHandler = async (
                     data.idioms,
                     '\n'
                 )}`,
+                quickReply: ReplyManager.getRepliesNotInGame(),
             },
         ]);
         return;
