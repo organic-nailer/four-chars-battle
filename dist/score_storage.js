@@ -8,22 +8,22 @@ const db_pool_1 = __importDefault(require("./db_pool"));
 class ScoreStorage {
     async getScores() {
         const client = await db_pool_1.default.connect();
-        const result = await client.query("SELECT * FROM UserData ORDER BY high_score DESC");
+        const result = await client.query('SELECT * FROM UserData ORDER BY high_score DESC');
         client.release();
         return result.rows;
     }
     async saveScore(userId, score) {
         const client = await db_pool_1.default.connect();
         const nowStr = new Date().toISOString();
-        await client.query("INSERT INTO UserData(user_id, high_score, updated_at)"
-            + " VALUES($1, $2, $3)"
-            + " ON CONFLICT(user_id)"
-            + " DO UPDATE SET high_score=$2, updated_at=$3", [userId, score, nowStr]);
+        await client.query('INSERT INTO UserData(user_id, high_score, updated_at)' +
+            ' VALUES($1, $2, $3)' +
+            ' ON CONFLICT(user_id)' +
+            ' DO UPDATE SET high_score=$2, updated_at=$3', [userId, score, nowStr]);
         client.release();
     }
     async getUserScore(userId) {
         const client = await db_pool_1.default.connect();
-        const result = await client.query("SELECT high_score FROM UserData WHERE user_id=$1", [userId]);
+        const result = await client.query('SELECT high_score FROM UserData WHERE user_id=$1', [userId]);
         client.release();
         if (result.rows.length === 0)
             return null;

@@ -1,34 +1,33 @@
-import { QuickReply, QuickReplyItem } from "@line/bot-sdk";
-import { createRequire } from "module";
+import { QuickReply, QuickReplyItem } from '@line/bot-sdk';
 
 export class ReplyManager {
     static getRepliesInGame(idioms: string[]): QuickReply {
-        const items: QuickReplyItem[] = idioms.map(idiom => {
+        const items: QuickReplyItem[] = idioms.map((idiom) => {
             return ReplyManager.createReplyItem(idiom);
         });
-        items.unshift(ReplyManager.createReplyItem("やめる"));
+        items.unshift(ReplyManager.createReplyItem('やめる'));
         return {
-            items: items
+            items: items,
         };
     }
 
     static getRepliesNotInGame(): QuickReply {
         return {
             items: [
-                ReplyManager.createReplyItem("はじめる"),
-                ReplyManager.createReplyItem("説明を見る"),
-            ]
+                ReplyManager.createReplyItem('はじめる'),
+                ReplyManager.createReplyItem('説明を見る'),
+            ],
         };
     }
 
     private static createReplyItem(text: string): QuickReplyItem {
         return {
-            type: "action",
+            type: 'action',
             action: {
-                type: "message",
+                type: 'message',
                 label: text,
-                text: text
-            }
+                text: text,
+            },
         };
     }
 }

@@ -32,13 +32,16 @@ class GameManager {
             if (err)
                 throw err;
             this.setIdioms(data);
-            console.log("finished GameManager init");
+            console.log('finished GameManager init');
         });
     }
     setIdioms(idioms) {
-        idioms.split("\n").forEach((line) => {
-            const [idiom, weight, center] = line.split(",");
-            this.idiomMap.set(idiom, { centerOfGravity: parseFloat(center), weight: parseInt(weight) });
+        idioms.split('\n').forEach((line) => {
+            const [idiom, weight, center] = line.split(',');
+            this.idiomMap.set(idiom, {
+                centerOfGravity: parseFloat(center),
+                weight: parseInt(weight),
+            });
         });
     }
     isIdiom(text) {
@@ -50,7 +53,9 @@ class GameManager {
         let index = 0;
         let currentInfo = { centerOfGravity: 0, weight: 0 };
         while (index < idioms.length) {
-            const offset = index + 1 < idioms.length ? idioms[index].offset - idioms[index + 1].offset : idioms[index].offset;
+            const offset = index + 1 < idioms.length
+                ? idioms[index].offset - idioms[index + 1].offset
+                : idioms[index].offset;
             currentInfo = this.mergeDetail(currentInfo, this.getDetail(idioms[index].idiom), offset);
             console.log(`0-${index} center is ${currentInfo.centerOfGravity}, ${currentInfo.weight} : offset is ${offset}`);
             if (!this.checkStableOffsetting(currentInfo.centerOfGravity, offset))
@@ -69,8 +74,10 @@ class GameManager {
     mergeDetail(base, above, offset) {
         const weight = base.weight + above.weight;
         return {
-            centerOfGravity: (base.centerOfGravity * base.weight + (above.centerOfGravity + offset) * above.weight) / weight,
-            weight: weight
+            centerOfGravity: (base.centerOfGravity * base.weight +
+                (above.centerOfGravity + offset) * above.weight) /
+                weight,
+            weight: weight,
         };
     }
     getDetail(idiom) {
@@ -85,12 +92,18 @@ class GameManager {
             return `${this.spaces(idiom.offset - offsetMin)}${idiom.idiom}${this.spaces(offsetMax - idiom.offset)}`;
         });
         if (collapsedHeight !== null) {
-            strList.splice(collapsedHeight + 1, 0, Array(-offsetMin + offsetMax + 4).fill("ー").join(""));
+            strList.splice(collapsedHeight + 1, 0, Array(-offsetMin + offsetMax + 4)
+                .fill('ー')
+                .join(''));
         }
-        return `${Array(-offsetMin).fill("＿").join("")}${idioms.length}m${Array(offsetMax).fill("＿").join("")}` + divider + strList.join(divider);
+        return (`${Array(-offsetMin).fill('＿').join('')}${idioms.length}m${Array(offsetMax)
+            .fill('＿')
+            .join('')}` +
+            divider +
+            strList.join(divider));
     }
     spaces(n) {
-        return Array(n).fill("　").join("");
+        return Array(n).fill('　').join('');
     }
     calcOffset(base, above) {
         const baseDetail = this.getDetail(base);
@@ -116,6 +129,4 @@ class GameManager {
     }
 }
 exports.GameManager = GameManager;
-;
-;
 //# sourceMappingURL=game_manager.js.map

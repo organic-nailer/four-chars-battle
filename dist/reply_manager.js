@@ -3,30 +3,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReplyManager = void 0;
 class ReplyManager {
     static getRepliesInGame(idioms) {
-        const items = idioms.map(idiom => {
+        const items = idioms.map((idiom) => {
             return ReplyManager.createReplyItem(idiom);
         });
-        items.unshift(ReplyManager.createReplyItem("やめる"));
+        items.unshift(ReplyManager.createReplyItem('やめる'));
         return {
-            items: items
+            items: items,
         };
     }
     static getRepliesNotInGame() {
         return {
             items: [
-                ReplyManager.createReplyItem("はじめる"),
-                ReplyManager.createReplyItem("説明を見る"),
-            ]
+                ReplyManager.createReplyItem('はじめる'),
+                ReplyManager.createReplyItem('説明を見る'),
+            ],
         };
     }
     static createReplyItem(text) {
         return {
-            type: "action",
+            type: 'action',
             action: {
-                type: "message",
+                type: 'message',
                 label: text,
-                text: text
-            }
+                text: text,
+            },
         };
     }
 }
