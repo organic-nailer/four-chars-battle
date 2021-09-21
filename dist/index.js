@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const bot_sdk_1 = require("@line/bot-sdk");
 const game_manager_1 = require("./game_manager");
 const reply_manager_1 = require("./reply_manager");
-const score_storage_1 = require("score_storage");
+const score_storage_1 = require("./score_storage");
 const clientConfig = {
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
     channelSecret: process.env.CHANNEL_SECRET,

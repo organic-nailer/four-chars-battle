@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import { ClientConfig, Client, middleware, MiddlewareConfig, WebhookEvent, TextMessage, MessageAPIResponseBase } from '@line/bot-sdk';
 import { GameManager, DisplayIdiomData } from "./game_manager";
 import { ReplyManager } from "./reply_manager";
-import { ScoreStorage } from 'score_storage';
+import { ScoreStorage } from './score_storage';
 
 const clientConfig: ClientConfig = {
 	channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
