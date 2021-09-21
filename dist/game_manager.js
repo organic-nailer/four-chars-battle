@@ -133,7 +133,7 @@ class GameManager {
         }
         const result = new Array(num);
         for (let i = 0; i < num; i++) {
-            result[i] = idiomList[Math.floor(Math.random() * idiomList.length)];
+            result[i] = idiomList[Math.floor(Math.random() * idiomList.length)][0];
         }
         return result;
     }

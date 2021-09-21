@@ -151,9 +151,9 @@ export class GameManager {
                 (value) => Math.abs(value[1].weight - weight) <= 15
             );
         }
-        const result = new Array(num);
+        const result: string[] = new Array(num);
         for (let i = 0; i < num; i++) {
-            result[i] = idiomList[Math.floor(Math.random() * idiomList.length)];
+            result[i] = idiomList[Math.floor(Math.random() * idiomList.length)][0];
         }
         return result;
     }
