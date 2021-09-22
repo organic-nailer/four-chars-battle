@@ -15,6 +15,8 @@ const altIdioms = [
     '完全無欠,29,-0.0517',
     '天変地異,30,0.3000',
     '天衣無縫,39,0.5769',
+    '得意忘形,40,-0.1500',
+    '女人禁制,26,0.5000',
 ].join('\n');
 
 const gameManager: GameManager = new GameManager(altIdioms);
@@ -28,14 +30,14 @@ test('オフセットの計算', () => {
     expect(gameManager.calcOffset('一将万骨', '一笑千金')).toBe(0);
     expect(gameManager.calcOffset('一種一瓶', '一笑千金')).toBe(-1);
     expect(gameManager.calcOffset('一笑千金', '一種一瓶')).toBe(1);
-    expect(gameManager.calcOffset('一士諤諤', '一種一瓶')).toBe(-2);
-    expect(gameManager.calcOffset('一笑千金', '一士諤諤')).toBe(2);
+    expect(gameManager.calcOffset('一顧傾城', '一紙半銭')).toBe(-2);
+    expect(gameManager.calcOffset('一紙半銭', '一顧傾城')).toBe(2);
     expect(gameManager.calcOffset('一顧傾城', '一心一徳')).toBe(-3);
     expect(gameManager.calcOffset('一心一徳', '一顧傾城')).toBe(3);
 });
 
 test('バランスが取れていない場合', () => {
-    const idioms: DisplayIdiomData[] = [
+    let idioms: DisplayIdiomData[] = [
         { idiom: '三三五五', offset: -6 },
         { idiom: '一日千秋', offset: -5 },
         { idiom: '一衣帯水', offset: -4 },
@@ -45,4 +47,9 @@ test('バランスが取れていない場合', () => {
         { idiom: '天衣無縫', offset: 0 },
     ];
     expect(gameManager.checkStability(idioms)).toBe(2);
+    idioms = [
+        { idiom: '得意忘形', offset: 2 },
+        { idiom: '女人禁制', offset: 0 },
+    ];
+    expect(gameManager.checkStability(idioms)).toBe(true);
 });
