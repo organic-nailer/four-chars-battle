@@ -33,27 +33,12 @@ app.use(express.urlencoded({ extended: true }));
 const gameManager = new GameManager();
 const scoreStorage = new ScoreStorage();
 
+const debugUsers: Set<string> = new Set();
+
 interface GameData {
     idioms: DisplayIdiomData[];
     status: string;
-    collapsedHeight: number | null;
-}
-
-const gameData: GameData = {
-    idioms: [],
-    status: '問題なし',
-    collapsedHeight: null,
-};
-
-function updateStatus() {
-    const stability = gameManager.checkStability(gameData.idioms);
-    if (stability === true) {
-        gameData.collapsedHeight = null;
-        gameData.status = '問題なし';
-    } else {
-        gameData.collapsedHeight = stability;
-        gameData.status = '崩れました';
-    }
+    debug: boolean;
 }
 
 enum GameState {
@@ -68,34 +53,34 @@ function getGameState(userId: string): GameState {
     return GameState.NotInGame;
 }
 
-app.get('/', (req, res) => {
-    res.render('views', {
-        field: gameManager.idiom2String(
-            gameData.idioms,
-            gameData.collapsedHeight,
-            '<br/>'
-        ),
-        status: gameData.status,
-    });
-});
+// app.get('/', (req, res) => {
+//     res.render('views', {
+//         field: gameManager.idiom2String(
+//             gameData.idioms,
+//             gameData.collapsedHeight,
+//             '<br/>'
+//         ),
+//         status: gameData.status,
+//     });
+// });
 
-app.post('/', (req, res) => {
-    const idiom = req.body['battle'];
-    const offset =
-        gameData.idioms.length == 0
-            ? 0
-            : gameManager.calcOffset(gameData.idioms[0].idiom, idiom) +
-              gameData.idioms[0].offset;
-    gameData.idioms.unshift({ idiom: idiom, offset: offset });
-    updateStatus();
-    res.redirect('/');
-});
+// app.post('/', (req, res) => {
+//     const idiom = req.body['battle'];
+//     const offset =
+//         gameData.idioms.length == 0
+//             ? 0
+//             : gameManager.calcOffset(gameData.idioms[0].idiom, idiom) +
+//               gameData.idioms[0].offset;
+//     gameData.idioms.unshift({ idiom: idiom, offset: offset });
+//     updateStatus();
+//     res.redirect('/');
+// });
 
-app.post('/restart', (req, res) => {
-    gameData.idioms.splice(0);
-    updateStatus();
-    res.redirect('/');
-});
+// app.post('/restart', (req, res) => {
+//     gameData.idioms.splice(0);
+//     updateStatus();
+//     res.redirect('/');
+// });
 
 // This route is used for the Webhook.
 app.post(
@@ -153,10 +138,34 @@ const textEventHandler = async (
         return;
     }
 
+    // デバッグ時の設定
+    if (text === `${process.env.DEBUG_PASSWORD}=true;`) {
+        if (!debugUsers.has(userId)) {
+            debugUsers.add(userId);
+            await client.replyMessage(replyToken, {
+                type: 'text',
+                text: 'debug mode on',
+            });
+        }
+        return;
+    }
+    if (text === `${process.env.DEBUG_PASSWORD}=false;`) {
+        if (debugUsers.has(userId)) {
+            debugUsers.delete(userId);
+            await client.replyMessage(replyToken, {
+                type: 'text',
+                text: 'debug mode off',
+            });
+        }
+        return;
+    }
+
     const reply =
         getGameState(userId) == GameState.NotInGame
             ? ReplyManager.getRepliesNotInGame()
-            : ReplyManager.getRepliesInGame(gameManager.getRandomIdioms(5));
+            : ReplyManager.getRepliesInGame(
+                  gameManager.getRandomIdioms(5, null, false)
+              );
     if (text === '成績を見る') {
         const score = await scoreStorage.getUserScore(userId);
         await client.replyMessage(replyToken, {
@@ -189,7 +198,7 @@ const textEventHandler = async (
                 '　なるべく画数の近い四字熟語を選ぼう\n' +
                 '3.積み方に無理がでると崩れて終了\n\n' +
                 'アルゴリズム:\n' +
-                '差分=追加する四字熟語-下の四字熟語\n' +
+                '差分=追加する四字熟語の画数-下の四字熟語の画数\n' +
                 '方向=符号(差分)が+ならば右、-ならば左\n' +
                 '差分の絶対値=abs(差分)\n' +
                 '差分の絶対値<=2ならばずらさない\n' +
@@ -219,16 +228,17 @@ const textEventHandler = async (
     // Check if the user is in the game.
     if (getGameState(userId) === GameState.NotInGame) {
         if (text === 'はじめる') {
+            const debug = debugUsers.has(userId);
             lineGameMap.set(userId, {
                 idioms: [],
                 status: '問題なし',
-                collapsedHeight: null,
+                debug: debug,
             });
             await client.replyMessage(replyToken, {
                 type: 'text',
                 text: 'ゲームをはじめます',
                 quickReply: ReplyManager.getRepliesInGame(
-                    gameManager.getRandomIdioms(5)
+                    gameManager.getRandomIdioms(5, null, debug)
                 ),
             });
         } else {
@@ -253,7 +263,7 @@ const textEventHandler = async (
         lineGameMap.delete(userId);
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: 'ゲームをやめます\n記録:${data.idioms.length}',
+            text: `ゲームをやめます\n記録:${data.idioms.length}`,
             quickReply: ReplyManager.getRepliesNotInGame(),
         });
         return;
@@ -263,13 +273,13 @@ const textEventHandler = async (
         lineGameMap.set(userId, {
             idioms: [],
             status: '問題なし',
-            collapsedHeight: null,
+            debug: false,
         });
         await client.replyMessage(replyToken, {
             type: 'text',
             text: `やりなおします\n記録:${data.idioms.length}`,
             quickReply: ReplyManager.getRepliesInGame(
-                gameManager.getRandomIdioms(5)
+                gameManager.getRandomIdioms(5, null, data.debug)
             ),
         });
         return;
@@ -281,7 +291,7 @@ const textEventHandler = async (
             type: 'text',
             text: 'ちょっとそれわかんない！ごめんね青春！',
             quickReply: ReplyManager.getRepliesInGame(
-                gameManager.getRandomIdioms(5, topIdiomStrokes)
+                gameManager.getRandomIdioms(5, topIdiomStrokes, data.debug)
             ),
         });
         return;
@@ -293,7 +303,7 @@ const textEventHandler = async (
             type: 'text',
             text: `${text}はもう出たもん！やり直し！`,
             quickReply: ReplyManager.getRepliesInGame(
-                gameManager.getRandomIdioms(5, topIdiomStrokes)
+                gameManager.getRandomIdioms(5, topIdiomStrokes, data.debug)
             ),
         });
         return;
@@ -310,11 +320,12 @@ const textEventHandler = async (
     if (stability === true) {
         await client.replyMessage(replyToken, {
             type: 'text',
-            text: gameManager.idiom2String(data.idioms, null, '\n'),
+            text: gameManager.idiom2String(data.idioms, null, '\n', data.debug),
             quickReply: ReplyManager.getRepliesInGame(
                 gameManager.getRandomIdioms(
                     5,
-                    gameManager.getDetail(text).weight
+                    gameManager.getDetail(text).weight,
+                    data.debug
                 )
             ),
         });
@@ -325,7 +336,12 @@ const textEventHandler = async (
         await client.replyMessage(replyToken, [
             {
                 type: 'text',
-                text: gameManager.idiom2String(data.idioms, stability, '\n'),
+                text: gameManager.idiom2String(
+                    data.idioms,
+                    stability,
+                    '\n',
+                    data.debug
+                ),
             },
             {
                 type: 'text',

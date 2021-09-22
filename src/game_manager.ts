@@ -3,6 +3,7 @@ import * as fs from 'fs';
 export class GameManager {
     private idiomMap: Map<string, IdiomDetail> = new Map();
 
+    // 辞書を読み込む
     constructor(altIdioms: string | null = null) {
         if (altIdioms !== null) {
             this.setIdioms(altIdioms);
@@ -25,10 +26,14 @@ export class GameManager {
         });
     }
 
+    /// [text]が既知の四字熟語であるかを判定する
     isIdiom(text: string): boolean {
         return this.idiomMap.has(text);
     }
 
+    /// idiomsのタワーが安定であるかを判定する
+    /// true の場合、タワーが安定している
+    /// number の場合、上からnumber番目の高さで崩れる
     checkStability(idioms: DisplayIdiomData[]): number | true {
         if (idioms.length <= 1) return true;
         let index = 0;
@@ -61,6 +66,7 @@ export class GameManager {
         return center <= -offset + 2;
     }
 
+    /// 崩れた原因を表示するための文字列を生成
     createCauseOfDefeat(idioms: DisplayIdiomData[], divider: string): string {
         const causeOfDefeat = idioms.map((idiom) => {
             const detail = this.getDetail(idiom.idiom);
@@ -91,7 +97,8 @@ export class GameManager {
     idiom2String(
         idioms: DisplayIdiomData[],
         collapsedHeight: number | null,
-        divider: string
+        divider: string,
+        debug: boolean
     ): string {
         const offsetMax = idioms.reduce(
             (acc, cur) => Math.max(acc, cur.offset),
@@ -104,9 +111,16 @@ export class GameManager {
         const strList = idioms.map((idiom) => {
             // const detail = this.getDetail(idiom.idiom);
             // return `${this.spaces(idiom.offset - offsetMin)}${idiom.idiom}(${detail.centerOfGravity},${detail.weight})${this.spaces(offsetMax - idiom.offset)}`;
-            return `${this.spaces(idiom.offset - offsetMin)}${
-                idiom.idiom
-            }${this.spaces(offsetMax - idiom.offset)}`;
+            if (debug) {
+                const detail = this.getDetail(idiom.idiom);
+                return `${this.spaces(idiom.offset - offsetMin)}${
+                    idiom.idiom
+                }(${detail.weight},${detail.centerOfGravity.toFixed(2)})`;
+            } else {
+                return `${this.spaces(idiom.offset - offsetMin)}${
+                    idiom.idiom
+                }${this.spaces(offsetMax - idiom.offset)}`;
+            }
         });
         if (collapsedHeight !== null) {
             strList.splice(
@@ -144,7 +158,11 @@ export class GameManager {
         return diffIsPositive ? 3 : -3;
     }
 
-    getRandomIdioms(num: number, weight: number | null = null): string[] {
+    getRandomIdioms(
+        num: number,
+        weight: number | null = null,
+        debug: boolean
+    ): string[] {
         let idiomList = Array.from(this.idiomMap.entries());
         if (weight !== null) {
             idiomList = idiomList.filter(
@@ -153,7 +171,16 @@ export class GameManager {
         }
         const result: string[] = new Array(num);
         for (let i = 0; i < num; i++) {
-            result[i] = idiomList[Math.floor(Math.random() * idiomList.length)][0];
+            if (debug) {
+                const idiom =
+                    idiomList[Math.floor(Math.random() * idiomList.length)];
+                result[i] = `${idiom[0]}(${
+                    idiom[1].weight
+                },${idiom[1].centerOfGravity.toFixed(2)})`;
+            } else {
+                result[i] =
+                    idiomList[Math.floor(Math.random() * idiomList.length)][0];
+            }
         }
         return result;
     }
