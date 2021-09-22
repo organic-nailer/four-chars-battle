@@ -4,7 +4,7 @@ exports.ReplyManager = void 0;
 class ReplyManager {
     static getRepliesInGame(idioms) {
         const items = idioms.map((idiom) => {
-            return ReplyManager.createReplyItem(idiom);
+            return ReplyManager.createReplyItem(idiom, true);
         });
         items.unshift(ReplyManager.createReplyItem('やめる'));
         return {
@@ -20,13 +20,13 @@ class ReplyManager {
             ],
         };
     }
-    static createReplyItem(text) {
+    static createReplyItem(text, slice = false) {
         return {
             type: 'action',
             action: {
                 type: 'message',
                 label: text,
-                text: text,
+                text: slice ? text.slice(0, 4) : text,
             },
         };
     }

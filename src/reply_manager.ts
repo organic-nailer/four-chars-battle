@@ -3,7 +3,7 @@ import { QuickReply, QuickReplyItem } from '@line/bot-sdk';
 export class ReplyManager {
     static getRepliesInGame(idioms: string[]): QuickReply {
         const items: QuickReplyItem[] = idioms.map((idiom) => {
-            return ReplyManager.createReplyItem(idiom);
+            return ReplyManager.createReplyItem(idiom, true);
         });
         items.unshift(ReplyManager.createReplyItem('やめる'));
         return {
@@ -21,13 +21,16 @@ export class ReplyManager {
         };
     }
 
-    private static createReplyItem(text: string): QuickReplyItem {
+    private static createReplyItem(
+        text: string,
+        slice = false
+    ): QuickReplyItem {
         return {
             type: 'action',
             action: {
                 type: 'message',
                 label: text,
-                text: text,
+                text: slice ? text.slice(0, 4) : text,
             },
         };
     }
