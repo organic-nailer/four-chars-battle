@@ -198,7 +198,7 @@ const textEventHandler = async (
                 '　なるべく画数の近い四字熟語を選ぼう\n' +
                 '3.積み方に無理がでると崩れて終了\n\n' +
                 '詳しくは↓\n' +
-                'https://sites.google.com/view/pizzxa/apps/%E5%9B%9B%E5%AD%97%E7%86%9F%E8%AA%9E%E3%82%BF%E3%83%AF%E3%83%BC%E3%83%90%E3%83%88%E3%83%AB#h.jluxvpyoe4f9',
+                'https://pizzxa.fastriver.dev/apps/%E5%9B%9B%E5%AD%97%E7%86%9F%E8%AA%9E%E3%82%BF%E3%83%AF%E3%83%BC%E3%83%90%E3%83%88%E3%83%AB#h.jluxvpyoe4f9',
             quickReply: reply,
         });
         return;
