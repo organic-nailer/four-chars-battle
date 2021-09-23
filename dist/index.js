@@ -144,6 +144,60 @@ const textEventHandler = async (event) => {
         });
         return;
     }
+    if (text === 'ランキング') {
+        const max = 10;
+        const scores = await scoreStorage.getScores();
+        const myScoreIndex = scores.findIndex((s) => s.user_id === userId);
+        const nowStr = new Date().toLocaleString();
+        const topScores = scores.slice(0, max).map((s, i) => {
+            return {
+                score: s.high_score,
+                rank: i + 1,
+                date: s.updated_at,
+                emphasis: false,
+            };
+        });
+        if (myScoreIndex >= 0 && myScoreIndex >= max) {
+            topScores.pop();
+            topScores.push({
+                score: scores[myScoreIndex].high_score,
+                rank: myScoreIndex + 1,
+                date: scores[myScoreIndex].updated_at,
+                emphasis: true,
+            });
+        }
+        else if (myScoreIndex >= 0) {
+            topScores[myScoreIndex].emphasis = true;
+        }
+        await client.replyMessage(replyToken, {
+            type: 'flex',
+            altText: 'ランキング',
+            contents: {
+                type: 'bubble',
+                header: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'text',
+                            text: `ランキング(${nowStr})`,
+                        },
+                    ],
+                },
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: topScores.map((score) => {
+                        return {
+                            type: 'text',
+                            text: `${score.rank}. ${score.score}m (${score.date})`,
+                            weight: score.emphasis ? 'bold' : 'regular',
+                        };
+                    }),
+                },
+            },
+        });
+    }
     if (text === '説明を見る') {
         await client.replyMessage(replyToken, {
             type: 'text',
