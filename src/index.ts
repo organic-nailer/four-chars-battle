@@ -82,6 +82,17 @@ function getGameState(userId: string): GameState {
 //     res.redirect('/');
 // });
 
+function createShareLink(score: number): string {
+    return (
+        'https://twitter.com/intent/tweet' +
+        `?text=%E5%9B%9B%E5%AD%97%E7%86%9F%E8%AA%9E%E3%82%92${score}m` +
+        '%E7%A9%8D%E3%81%BF%E4%B8%8A%E3%81%92%E3%81%BE%E3%81%97%E3%81' +
+        '%9F%EF%BC%81%0A%23%E5%9B%9B%E5%AD%97%E7%86%9F%E8%AA%9E%E3%82' +
+        '%BF%E3%83%AF%E3%83%BC%E3%83%90%E3%83%88%E3%83%AB%0A%23%E7%9F' +
+        '%A2%E4%B8%8A%E7%A5%AD%20%23kcs_web%0Ahttps%3A%2F%2Flin.ee%2FLgKV1sj'
+    );
+}
+
 // This route is used for the Webhook.
 app.post(
     '/webhook',
@@ -261,11 +272,17 @@ const textEventHandler = async (
     if (text === 'やめる') {
         await scoreStorage.saveScore(userId, data.idioms.length);
         lineGameMap.delete(userId);
-        await client.replyMessage(replyToken, {
-            type: 'text',
-            text: `ゲームをやめます\n記録:${data.idioms.length}`,
-            quickReply: ReplyManager.getRepliesNotInGame(),
-        });
+        await client.replyMessage(replyToken, [
+            {
+                type: 'text',
+                text: `ゲームをやめます\n記録:${data.idioms.length}`,
+            },
+            {
+                type: 'text',
+                text: `共有する↓\n${createShareLink(data.idioms.length)}`,
+                quickReply: ReplyManager.getRepliesNotInGame(),
+            },
+        ]);
         return;
     }
     if (text === 'やりなおす') {
@@ -346,6 +363,10 @@ const textEventHandler = async (
             {
                 type: 'text',
                 text: `崩れました...\n記録: ${data.idioms.length}m`,
+            },
+            {
+                type: 'text',
+                text: `共有する↓\n${createShareLink(data.idioms.length)}`,
             },
             {
                 type: 'text',
