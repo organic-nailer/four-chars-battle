@@ -12,7 +12,7 @@ export class ScoreStorage {
             return {
                 user_id: row.user_id,
                 high_score: row.high_score,
-                updated_at: moment(row.updated_at).format('MM/DD hh:mm'),
+                updated_at: moment(row.updated_at).format('MM/DD HH:mm'),
             };
         });
     }

@@ -15,7 +15,7 @@ class ScoreStorage {
             return {
                 user_id: row.user_id,
                 high_score: row.high_score,
-                updated_at: (0, moment_1.default)(row.updated_at).format('MM/DD hh:mm'),
+                updated_at: (0, moment_1.default)(row.updated_at).format('MM/DD HH:mm'),
             };
         });
     }
