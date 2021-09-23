@@ -26,7 +26,7 @@ export class ScoreStorage {
         const highScore =
             result.rows.length === 0 ? 0 : result.rows[0].high_score;
         if (score > highScore) {
-            const nowStr = moment().toDate();
+            const nowStr = moment().toISOString();
             await client.query(
                 'INSERT INTO UserData2(user_id, high_score, updated_at)' +
                     ' VALUES($1, $2, $3)' +

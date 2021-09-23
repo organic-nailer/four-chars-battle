@@ -24,7 +24,7 @@ class ScoreStorage {
         const result = await client.query('SELECT high_score FROM UserData2 WHERE user_id=$1', [userId]);
         const highScore = result.rows.length === 0 ? 0 : result.rows[0].high_score;
         if (score > highScore) {
-            const nowStr = (0, moment_1.default)().toDate();
+            const nowStr = (0, moment_1.default)().toISOString();
             await client.query('INSERT INTO UserData2(user_id, high_score, updated_at)' +
                 ' VALUES($1, $2, $3)' +
                 ' ON CONFLICT(user_id)' +
