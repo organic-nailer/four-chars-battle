@@ -16,6 +16,7 @@ class ReplyManager {
             items: [
                 ReplyManager.createReplyItem('はじめる'),
                 ReplyManager.createReplyItem('遊び方'),
+                ReplyManager.createReplyItem('ランキング'),
                 ReplyManager.createReplyItem('成績を見る'),
             ],
         };

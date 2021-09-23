@@ -232,7 +232,7 @@ const textEventHandler = async (
                     contents: [
                         {
                             type: 'text',
-                            text: `ランキング(${nowStr})`,
+                            text: `全体ランキング(${nowStr})`,
                         },
                     ],
                 },
