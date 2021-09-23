@@ -26,9 +26,9 @@ class ScoreStorage {
         if (score > highScore) {
             const nowStr = (0, moment_1.default)().toDate();
             await client.query('INSERT INTO UserData2(user_id, high_score, updated_at)' +
-                ' VALUES($1, $2, to_timestamp($3 / 1000.0))' +
+                ' VALUES($1, $2, $3)' +
                 ' ON CONFLICT(user_id)' +
-                ' DO UPDATE SET high_score=$2, updated_at=to_timestamp($3 / 1000.0)', [userId, score, nowStr]);
+                ' DO UPDATE SET high_score=$2, updated_at=$3', [userId, score, nowStr]);
         }
         client.release();
     }
