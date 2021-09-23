@@ -147,6 +147,14 @@ const textEventHandler = async (event) => {
     if (text === 'ランキング') {
         const max = 10;
         const scores = await scoreStorage.getScores();
+        if (scores.length === 0) {
+            await client.replyMessage(replyToken, {
+                type: 'text',
+                text: '記録がありません',
+                quickReply: reply,
+            });
+            return;
+        }
         const myScoreIndex = scores.findIndex((s) => s.user_id === userId);
         const nowStr = new Date().toLocaleString();
         const topScores = scores.slice(0, max).map((s, i) => {
@@ -197,6 +205,7 @@ const textEventHandler = async (event) => {
                 },
             },
         });
+        return;
     }
     if (text === '説明を見る') {
         await client.replyMessage(replyToken, {
