@@ -5,10 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bot_sdk_1 = require("@line/bot-sdk");
-const moment_1 = __importDefault(require("moment"));
+const moment_timezone_1 = __importDefault(require("moment-timezone"));
 const game_manager_1 = require("./game_manager");
 const reply_manager_1 = require("./reply_manager");
 const score_storage_1 = require("./score_storage");
+moment_timezone_1.default.tz.setDefault('Asia/Tokyo');
 const clientConfig = {
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
     channelSecret: process.env.CHANNEL_SECRET,
@@ -157,7 +158,7 @@ const textEventHandler = async (event) => {
             return;
         }
         const myScoreIndex = scores.findIndex((s) => s.user_id === userId);
-        const nowStr = (0, moment_1.default)().format('MM/DD HH:mm現在');
+        const nowStr = (0, moment_timezone_1.default)().format('MM/DD HH:mm現在');
         const topScores = scores.slice(0, max).map((s, i) => {
             return {
                 score: s.high_score,

@@ -7,10 +7,12 @@ import {
     WebhookEvent,
     MessageAPIResponseBase,
 } from '@line/bot-sdk';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { GameManager, DisplayIdiomData } from './game_manager';
 import { ReplyManager } from './reply_manager';
 import { ScoreStorage } from './score_storage';
+
+moment.tz.setDefault('Asia/Tokyo');
 
 const clientConfig: ClientConfig = {
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
