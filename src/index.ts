@@ -7,6 +7,7 @@ import {
     WebhookEvent,
     MessageAPIResponseBase,
 } from '@line/bot-sdk';
+import moment from 'moment';
 import { GameManager, DisplayIdiomData } from './game_manager';
 import { ReplyManager } from './reply_manager';
 import { ScoreStorage } from './score_storage';
@@ -198,7 +199,7 @@ const textEventHandler = async (
             return;
         }
         const myScoreIndex = scores.findIndex((s) => s.user_id === userId);
-        const nowStr = new Date().toLocaleString();
+        const nowStr = moment().format('MM/DD HH:mm現在');
         const topScores = scores.slice(0, max).map((s, i) => {
             return {
                 score: s.high_score,

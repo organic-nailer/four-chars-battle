@@ -4,3 +4,10 @@ CREATE TABLE UserData (
 	updated_at DATE,
 	nickname TEXT
 );
+
+CREATE TABLE UserData2 (
+	user_id TEXT PRIMARY KEY,
+	high_score INT,
+	updated_at TIMESTAMP,
+	nickname TEXT
+);
