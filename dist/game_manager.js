@@ -57,13 +57,14 @@ class GameManager {
             return true;
         let index = 0;
         let currentInfo = this.getDetail(idioms[0].idiom);
-        let currentOffset = 0;
+        let currentOffset;
         while (index < idioms.length - 1) {
+            //indexのとき 0-indexの合計とindex+1の積み方を検査
+            currentOffset = idioms[index].offset - idioms[index + 1].offset;
             console.log(`0-${index} center is ${currentInfo.centerOfGravity}, ${currentInfo.weight} : offset is ${currentOffset}`);
             if (!this.checkStableOffsetting(currentInfo.centerOfGravity, currentOffset)) {
-                return index - 1;
+                return index;
             }
-            currentOffset = idioms[index].offset - idioms[index + 1].offset;
             currentInfo = this.mergeDetail(currentInfo, this.getDetail(idioms[index].idiom), currentOffset);
             index++;
         }

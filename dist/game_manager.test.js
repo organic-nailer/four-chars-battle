@@ -18,6 +18,7 @@ const altIdioms = [
     '天衣無縫,39,0.5769',
     '得意忘形,40,-0.1500',
     '女人禁制,26,0.5000',
+    '言語道断,45,0.1222',
 ].join('\n');
 const gameManager = new game_manager_1.GameManager(altIdioms);
 test('四字熟語かどうか判定する', () => {
@@ -49,5 +50,10 @@ test('バランスが取れていない場合', () => {
         { idiom: '女人禁制', offset: 0 },
     ];
     expect(gameManager.checkStability(idioms)).toBe(true);
+    idioms = [
+        { idiom: '言語道断', offset: 3 },
+        { idiom: '一日千秋', offset: 0 },
+    ];
+    expect(gameManager.checkStability(idioms)).toBe(0);
 });
 //# sourceMappingURL=game_manager.test.js.map
